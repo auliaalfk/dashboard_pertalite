@@ -1,0 +1,31 @@
+# Python virtual environment
+venv/
+ENV/
+env/
+
+# Node modules for Vite/React
+node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+.env
+*.env
+
+# Vite build output
+dist/
+build/
+
+# VSCode folder
+.vscode/
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+.DS_Store
