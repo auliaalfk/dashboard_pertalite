@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Home } from './components/Home';
-import { SentimentAnalysis } from './components/SentimentAnalysis';
+import SentimentAnalysis from './components/SentimentAnalysis';
 import { TopicModeling } from './components/TopicModeling';
 import EmotionAnalysis from './components/EmotionAnalysis'; 
 import { About } from './components/About';
