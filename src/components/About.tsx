@@ -7,34 +7,29 @@ const teamMembers = [
     name: 'Nama Anggota 1',
     nrp: '5026221001',
     role: 'Data Analyst & Frontend Developer',
-    email: 'member1@email.com',
     photo: 'team member 1'
   },
   {
     name: 'Nama Anggota 2',
     nrp: '5026221002',
     role: 'Machine Learning Engineer',
-    email: 'member2@email.com',
     photo: 'team member 2'
   },
   {
     name: 'Nama Anggota 3',
     nrp: '5026221003',
-    role: 'Data Scientist',
     email: 'member3@email.com',
     photo: 'team member 3'
   },
   {
-    name: 'Nama Anggota 4',
-    nrp: '5026221004',
-    role: 'NLP Specialist',
+    name: 'Dea Kayla Putri D',
+    nrp: '3323600005',
     email: 'member4@email.com',
     photo: 'team member 4'
   },
   {
     name: 'Nama Anggota 5',
     nrp: '5026221005',
-    role: 'UI/UX Designer',
     email: 'member5@email.com',
     photo: 'team member 5'
   },
