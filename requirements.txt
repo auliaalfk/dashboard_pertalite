@@ -1,0 +1,11 @@
+bertopic[no_umap]==0.16.2
+sentence-transformers
+scikit-learn
+numpy
+pandas
+gensim
+hdbscan==0.8.40
+openpyxl
+uvicorn
+fastapi
+python-multipart

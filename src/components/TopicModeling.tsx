@@ -1,169 +1,277 @@
-import { MessageSquare, Tag, TrendingUp } from 'lucide-react';
+import { MessageSquare, Tag, TrendingUp, Loader2, Lightbulb, BarChart3, Info, Fuel, DollarSign, Car, Wrench, AlertTriangle, Users, Zap, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { useState, useEffect } from 'react';
 
-const topics = [
-  { 
-    id: 1,
-    name: 'Harga & Ekonomi',
-    keywords: ['harga', 'murah', 'terjangkau', 'hemat', 'irit', 'kantong'],
-    posts: 4832,
-    percentage: 30.5,
-    color: 'from-purple-500 to-purple-600'
-  },
-  { 
-    id: 2,
-    name: 'Kualitas & Performa',
-    keywords: ['kualitas', 'performa', 'mesin', 'stabil', 'bagus', 'cocok'],
-    posts: 3654,
-    percentage: 23.1,
-    color: 'from-pink-500 to-pink-600'
-  },
-  { 
-    id: 3,
-    name: 'Ketersediaan',
-    keywords: ['antri', 'habis', 'stok', 'spbu', 'jauh', 'susah'],
-    posts: 2987,
-    percentage: 18.8,
-    color: 'from-orange-500 to-orange-600'
-  },
-  { 
-    id: 4,
-    name: 'Perbandingan BBM',
-    keywords: ['pertamax', 'vs', 'pertalite', 'beda', 'mending', 'pilih'],
-    posts: 2456,
-    percentage: 15.5,
-    color: 'from-yellow-500 to-yellow-600'
-  },
-  { 
-    id: 5,
-    name: 'Tips & Trik',
-    keywords: ['tips', 'cara', 'trik', 'pagi', 'fresh', 'saran'],
-    posts: 1918,
-    percentage: 12.1,
-    color: 'from-green-500 to-green-600'
-  },
-];
+interface TopicInfo {
+  id: number;
+  name: string;
+  keywords: string[];
+  posts: number;
+  percentage: number;
+  color: string;
+  explanation?: string;
+  example_comments?: string[];
+}
 
-const topicDistribution = [
-  { topic: 'Harga', value: 30.5 },
-  { topic: 'Kualitas', value: 23.1 },
-  { topic: 'Ketersediaan', value: 18.8 },
-  { topic: 'Perbandingan', value: 15.5 },
-  { topic: 'Tips', value: 12.1 },
-];
+interface TopicDistribution {
+  topic: string;
+  value: number;
+}
 
-const topicTrend = [
-  { topic: 'Harga', Week1: 450, Week2: 520, Week3: 580, Week4: 670 },
-  { topic: 'Kualitas', Week1: 340, Week2: 380, Week3: 420, Week4: 480 },
-  { topic: 'Ketersediaan', Week1: 280, Week2: 310, Week3: 340, Week4: 380 },
-  { topic: 'Perbandingan', Week1: 230, Week2: 260, Week3: 280, Week4: 310 },
-  { topic: 'Tips', Week1: 180, Week2: 200, Week3: 220, Week4: 250 },
-];
+interface ModelInfo {
+  model_name: string;
+  num_topics: number;
+  coherence: number;
+}
+
+interface Insights {
+  dominant_topic: { name: string; percentage: number };
+  least_discussed: { name: string; percentage: number };
+  coverage: string;
+  diversity: string;
+}
+
+interface TopicResponse {
+  topics: TopicInfo[];
+  distribution: TopicDistribution[];
+  total_documents: number;
+  model_info: ModelInfo;
+  insights: Insights;
+}
+
+// Array ikon untuk topik
+const topicIcons: Record<number, React.ComponentType<{ className?: string }>> = {
+  1: Fuel,
+  2: Wrench,
+  3: AlertTriangle,
+  4: Zap,
+  5: Shield,
+  6: Car,
+  7: DollarSign,
+  8: Users,
+};
 
 export function TopicModeling() {
+  const [topics, setTopics] = useState<TopicInfo[]>([]);
+  const [distribution, setDistribution] = useState<TopicDistribution[]>([]);
+  const [totalDocs, setTotalDocs] = useState(0);
+  const [modelInfo, setModelInfo] = useState<ModelInfo | null>(null);
+  const [insights, setInsights] = useState<Insights | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchTopics();
+  }, []);
+
+  const fetchTopics = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch('http://localhost:8000/api/topic/topics');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data: TopicResponse = await response.json();
+      
+      setTopics(data.topics);
+      setDistribution(data.distribution);
+      setTotalDocs(data.total_documents);
+      setModelInfo(data.model_info);
+      setInsights(data.insights);
+      
+    } catch (err) {
+      console.error('Error fetching topics:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load topics');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-purple-600 mx-auto mb-4" />
+          <p className="text-gray-600">Memuat data topik & menganalisis dengan AI...</p>
+          <p className="text-sm text-gray-500 mt-2">Proses ini membutuhkan waktu ~30 detik</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <p className="text-red-600 font-medium mb-2">Error Loading Topics</p>
+          <p className="text-red-500 text-sm">{error}</p>
+          <button
+            onClick={fetchTopics}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Coba Lagi
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const colorMap: Record<string, string> = {
+    'from-purple-500 to-purple-600': '#a855f7',
+    'from-pink-500 to-pink-600': '#ec4899',
+    'from-orange-500 to-orange-600': '#f97316',
+    'from-yellow-500 to-yellow-600': '#eab308',
+    'from-green-500 to-green-600': '#22c55e',
+    'from-blue-500 to-blue-600': '#3b82f6',
+    'from-red-500 to-red-600': '#ef4444',
+    'from-indigo-500 to-indigo-600': '#6366f1',
+  };
+
+  const getTopicIcon = (id: number) => {
+    return topicIcons[id] || Car;
+  };
+
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 mb-2">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-12">
+      {/* Header */}
+      <div className="text-center md:text-left mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 mb-2">
           Pemodelan Topik
         </h1>
-        <p className="text-gray-600">Analisis topik pembahasan dari komentar TikTok</p>
+        <p className="text-gray-600 text-sm md:text-base">
+          Analisis Komentar TikTok tentang BBM Motor
+        </p>
       </div>
 
-      {/* Topics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {topics.map((topic) => (
-          <Card key={topic.id} className="border-0 shadow-lg hover:shadow-xl transition-all bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className={`bg-gradient-to-br ${topic.color} p-3 rounded-xl`}>
-                  <Tag className="size-5 text-white" />
-                </div>
-                <div className="text-right">
-                  <p className="text-gray-900">{topic.percentage}%</p>
-                  <p className="text-xs text-gray-500">{topic.posts} posts</p>
-                </div>
-              </div>
-              <h3 className="text-gray-900 mb-3">{topic.name}</h3>
-              <div className="flex flex-wrap gap-2">
-                {topic.keywords.map((keyword, index) => (
-                  <span 
-                    key={index}
-                    className="text-xs px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full"
-                  >
-                    {keyword}
-                  </span>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Topic Summary Cards - Simplified (no percentage/posts) */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <Tag className="w-6 h-6 text-purple-600" />
+          Ringkasan Topik
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {topics.map((topic) => {
+            const IconComponent = getTopicIcon(topic.id);
+            return (
+              <Card key={topic.id} className="border-0 shadow-lg hover:shadow-xl transition-all bg-white group">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`bg-gradient-to-br ${topic.color} p-3 rounded-xl group-hover:scale-110 transition-transform`}>
+                      <IconComponent className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 flex-1">
+                      {topic.name}
+                    </h3>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {topic.keywords.slice(0, 6).map((keyword, index) => (
+                      <span 
+                        key={index}
+                        className="text-xs px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                    {topic.keywords.length > 6 && (
+                      <span className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-full">
+                        +{topic.keywords.length - 6}
+                      </span>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Charts */}
+      {/* Charts Section - 1x2 Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="size-5 text-purple-500" />
-              Distribusi Topik
+        
+        {/* Bar Chart */}
+        <Card className="border-0 shadow-lg bg-white">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+              <BarChart3 className="w-5 h-5 text-purple-600" />
+              Distribusi Topik (Bar Chart)
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={topicDistribution} layout="vertical">
+          <CardContent className="pb-8">
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={topics} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis type="number" stroke="#888" />
-                <YAxis dataKey="topic" type="category" stroke="#888" width={100} />
+                <XAxis type="number" stroke="#888" tick={{ fontSize: 11 }} />
+                <YAxis 
+                  dataKey="name" 
+                  type="category" 
+                  stroke="#888" 
+                  width={140}
+                  tick={{ fontSize: 11 }}
+                />
                 <Tooltip 
                   contentStyle={{ 
                     background: 'rgba(255, 255, 255, 0.95)', 
                     border: 'none', 
                     borderRadius: '12px',
                     boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                  }} 
+                  }}
+                  formatter={(value: number, name: string, props: any) => [
+                    `${value.toFixed(2)}% (${props.payload.posts.toLocaleString()} posts)`,
+                    'Persentase'
+                  ]}
                 />
-                <Bar dataKey="value" fill="url(#topicGradient)" radius={[0, 8, 8, 0]} />
-                <defs>
-                  <linearGradient id="topicGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#a855f7" />
-                    <stop offset="50%" stopColor="#ec4899" />
-                    <stop offset="100%" stopColor="#f97316" />
-                  </linearGradient>
-                </defs>
+                <Bar dataKey="percentage" radius={[0, 8, 8, 0]}>
+                  {topics.map((topic, index) => (
+                    <Cell key={`cell-${index}`} fill={colorMap[topic.color] || '#a855f7'} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="size-5 text-pink-500" />
-              Radar Topic Analysis
+        {/* Radar Chart */}
+        <Card className="border-0 shadow-lg bg-white">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+              <TrendingUp className="w-5 h-5 text-pink-600" />
+              Distribusi Topik (Radar Chart)
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <RadarChart data={topicDistribution}>
+          <CardContent className="pb-8">
+            <ResponsiveContainer width="100%" height={400}>
+              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={topics}>
                 <PolarGrid stroke="#e5e7eb" />
-                <PolarAngleAxis dataKey="topic" stroke="#888" />
-                <PolarRadiusAxis stroke="#888" />
-                <Radar 
-                  name="Topics" 
-                  dataKey="value" 
-                  stroke="#a855f7" 
-                  fill="#a855f7" 
-                  fillOpacity={0.6} 
+                <PolarAngleAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 11 }}
+                  stroke="#6b7280"
                 />
-                <Tooltip 
-                  contentStyle={{ 
-                    background: 'rgba(255, 255, 255, 0.95)', 
-                    border: 'none', 
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                  }} 
+                <PolarRadiusAxis 
+                  angle={30} 
+                  stroke="#9ca3af"
+                  tick={{ fontSize: 10 }}
+                />
+                <Radar
+                  name="Persentase"
+                  dataKey="percentage"
+                  stroke="#ec4899"
+                  fill="#ec4899"
+                  fillOpacity={0.6}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "rgba(255,255,255,0.95)",
+                    border: "none",
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  }}
+                  formatter={(value: number) => [`${value.toFixed(2)}%`, 'Persentase']}
                 />
               </RadarChart>
             </ResponsiveContainer>
@@ -171,48 +279,139 @@ export function TopicModeling() {
         </Card>
       </div>
 
-      {/* Topic Trends */}
-      <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="size-5 text-orange-500" />
-            Trend Topik per Minggu
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {topicTrend.map((topic, index) => {
-              const weeks = [topic.Week1, topic.Week2, topic.Week3, topic.Week4];
-              const maxWeek = Math.max(...weeks);
-              return (
-                <div key={index} className="p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-gray-900">{topic.topic}</p>
-                    <span className="text-sm text-green-600">
-                      +{Math.round(((topic.Week4 - topic.Week1) / topic.Week1) * 100)}%
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    {weeks.map((value, weekIndex) => (
-                      <div key={weekIndex}>
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-                            style={{ width: `${(value / maxWeek) * 100}%` }}
-                          ></div>
+      {/* Topic Explanation Section */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <MessageSquare className="w-6 h-6 text-pink-600" />
+          Penjelasan Detail Topik
+        </h2>
+        <div className="space-y-6">
+          {topics.map((topic) => {
+            const IconComponent = getTopicIcon(topic.id);
+            return (
+              <Card key={topic.id} className="border-0 shadow-lg bg-white hover:shadow-xl transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className={`bg-gradient-to-br ${topic.color} p-4 rounded-xl flex-shrink-0 shadow-md`}>
+                      <IconComponent className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-xl font-bold text-gray-900">
+                          {topic.name}
+                        </h3>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-gray-900">{topic.percentage}%</p>
+                          <p className="text-xs text-gray-500">{topic.posts.toLocaleString()} posts</p>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1 text-center">
-                          W{weekIndex + 1}: {value}
-                        </p>
                       </div>
-                    ))}
+                      <p className="text-gray-700 leading-relaxed mb-4 text-sm">
+                        {topic.explanation || 'Menunggu analisis...'}
+                      </p>
+                      
+                      {topic.example_comments && topic.example_comments.length > 0 && (
+                        <div className="mt-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
+                          <p className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <MessageSquare className="w-4 h-4 text-purple-600" />
+                            Contoh Komentar Asli:
+                          </p>
+                          <ul className="space-y-2">
+                            {topic.example_comments.map((comment, idx) => (
+                              <li key={idx} className="text-sm text-gray-600 pl-4 border-l-3 border-purple-400 italic">
+                                "{comment}"
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Insight Section */}
+      {insights && (
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-50 to-yellow-50 mb-8">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+              <Lightbulb className="w-5 h-5 text-orange-600" />
+              Key Insights
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="p-4 bg-white rounded-lg shadow-sm">
+                <p className="text-sm text-gray-600 mb-1">🏆 Topik Paling Dominan</p>
+                <p className="text-lg font-bold text-orange-600">
+                  {insights.dominant_topic.name}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">{insights.dominant_topic.percentage}% dari diskusi</p>
+              </div>
+              
+              <div className="p-4 bg-white rounded-lg shadow-sm">
+                <p className="text-sm text-gray-600 mb-1">📊 Topik Paling Jarang</p>
+                <p className="text-lg font-bold text-blue-600">
+                  {insights.least_discussed.name}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">{insights.least_discussed.percentage}% dari diskusi</p>
+              </div>
+              
+              <div className="p-4 bg-white rounded-lg shadow-sm">
+                <p className="text-sm text-gray-600 mb-1">🎯 Coverage</p>
+                <p className="text-base font-bold text-purple-600">{insights.coverage}</p>
+              </div>
+              
+              <div className="p-4 bg-white rounded-lg shadow-sm">
+                <p className="text-sm text-gray-600 mb-1">🌈 Keberagaman Topik</p>
+                <p className="text-base font-bold text-pink-600">{insights.diversity}</p>
+              </div>
+            </div>
+            
+            <div className="p-4 bg-white rounded-lg shadow-sm border-l-4 border-orange-400">
+              <p className="text-sm text-gray-700 leading-relaxed">
+                <strong>💡 Rekomendasi:</strong> Topik "<strong>{insights.dominant_topic.name}</strong>" mendominasi diskusi dengan {insights.dominant_topic.percentage}% dari total komentar. 
+                Fokus strategi konten pada topik ini untuk engagement maksimal, sambil mengeksplorasi topik niche seperti "<strong>{insights.least_discussed.name}</strong>" untuk diferensiasi konten.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Model Information */}
+      {modelInfo && (
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+              <Info className="w-5 h-5 text-purple-600" />
+              Informasi Model
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                <p className="text-sm text-gray-600 mb-1">Model</p>
+                <p className="text-lg md:text-xl font-bold text-purple-600">{modelInfo.model_name}</p>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                <p className="text-sm text-gray-600 mb-1">Topics</p>
+                <p className="text-lg md:text-xl font-bold text-pink-600">{modelInfo.num_topics}</p>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                <p className="text-sm text-gray-600 mb-1">Coherence</p>
+                <p className="text-lg md:text-xl font-bold text-orange-600">{modelInfo.coherence.toFixed(3)}</p>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                <p className="text-sm text-gray-600 mb-1">Documents</p>
+                <p className="text-lg md:text-xl font-bold text-blue-600">{totalDocs.toLocaleString()}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

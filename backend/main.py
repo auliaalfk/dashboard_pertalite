@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.router import home, sentiment, emotion
+from backend.router import home, sentiment, emotion, topic
 
 
 app = FastAPI()
@@ -17,6 +17,7 @@ app.add_middleware(
 app.include_router(home.router, prefix="/api/home", tags=["Home"])
 app.include_router(emotion.router, prefix="/api/emotion", tags=["Emotion"])
 app.include_router(sentiment.router, prefix="/api/sentiment", tags=["Sentiment"])
+app.include_router(topic.router, prefix="/api/topic", tags=["Topic"])
 
 @app.get("/")
 def root():
