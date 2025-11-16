@@ -1,11 +1,6 @@
-// (Lokasi: src/components/Home.tsx)
-// GANTI SELURUH FILE ANDA DENGAN INI
-
 import { useState, useEffect } from 'react';
 import { TrendingUp, Users, MessageCircle, Heart, Clock, Calendar, Award } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-
-// IMPORT LIBRARY GRAFIK (ANDA SUDAH INSTALL INI)
 import { 
   AreaChart, Area, 
   BarChart, Bar, 
@@ -13,7 +8,6 @@ import {
   CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
 
-// --- TIPE DATA (Biar tidak error) ---
 interface KpiCards {
   total_comments: number;
   total_likes: number;
@@ -50,7 +44,6 @@ interface HomeData {
   most_influential_accounts: TopUser[];
 }
 
-// --- Hook untuk Menunggu Browser Siap (Kita masukkan di sini) ---
 function useHasMounted() {
   const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => {
@@ -59,18 +52,14 @@ function useHasMounted() {
   return hasMounted;
 }
 
-
-// --- KOMPONEN UTAMA ANDA ---
 export function Home() {
   const [data, setData] = useState<HomeData | null>(null);
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Panggil hook-nya
   const hasMounted = useHasMounted();
 
   useEffect(() => {
-    // Pastikan port-nya sama dengan backend Anda (8000)
     fetch('http://127.0.0.1:8000/api/home/summary') 
       .then(res => {
         if (!res.ok) {
@@ -90,7 +79,6 @@ export function Home() {
   }, []); 
 
   
-  // --- Handle Loading & Error ---
   if (isLoading) {
     return <div className="p-8 text-center text-lg">Memuat data dashboard...</div>;
   }
@@ -101,7 +89,6 @@ export function Home() {
     return <div className="p-8 text-center text-lg">Data tidak ditemukan.</div>;
   }
   
-  // --- Data untuk KPI Cards ---
   const stats = [
     { label: 'Total Comments', value: data.kpi_cards.total_comments.toLocaleString(), change: 'Unique', icon: MessageCircle, color: 'from-purple-500 to-purple-600' },
     { label: 'Total Likes', value: data.kpi_cards.total_likes.toLocaleString(), change: 'On Comments', icon: Heart, color: 'from-pink-500 to-pink-600' },
@@ -109,7 +96,6 @@ export function Home() {
     { label: 'Avg. Engagement', value: data.kpi_cards.avg_engagement.toString(), change: 'Likes/Comment', icon: TrendingUp, color: 'from-yellow-500 to-yellow-600' },
   ];
 
-  // --- Data & Mapping untuk Grafik ---
   const hourlyData = data.hourly_chart.map(item => ({
     ...item,
     hour: item.hour_WIB.toString().padStart(2, '0')
@@ -130,7 +116,6 @@ export function Home() {
   
   return (
     <div className="p-8">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 mb-2">
           Pertalite Analytics Dashboard
@@ -138,7 +123,6 @@ export function Home() {
         <p className="text-gray-600">Comprehensive insights from TikTok comments & engagement</p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -160,10 +144,7 @@ export function Home() {
           );
         })}
       </div>
-
-      {/* --- KODE GRAFIK LANGSUNG DI SINI --- */}
       
-      {/* Timeline Section */}
       <div className="mb-8">
         <h2 className="text-gray-900 mb-4 flex items-center gap-2">
           <Clock className="size-5 text-purple-500" />
@@ -171,7 +152,6 @@ export function Home() {
         </h2>
         <div className="grid grid-cols-1 gap-6">
           
-          {/* 1. TimelineByDate (KODE RESPONSIF) */}
           <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -179,10 +159,9 @@ export function Home() {
                 Daily Comment Activity & Engagement Trend
               </CardTitle>
             </CardHeader>
-            {/* Beri tinggi pada kotaknya, BUKAN pada grafiknya */}
             <CardContent className="h-[350px]"> 
               {hasMounted && (
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={data.daily_trend_chart}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="date_WIB" stroke="#888" tick={{ fontSize: 12 }} />
@@ -202,7 +181,6 @@ export function Home() {
           </Card>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* 2. TimelineByHour (KODE RESPONSIF) */}
             <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -212,7 +190,7 @@ export function Home() {
               </CardHeader>
               <CardContent className="h-[300px]">
                 {hasMounted && (
-                  <ResponsiveContainer width="100%" height={300}>
+                  <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={hourlyData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="hour" stroke="#888" tick={{ fontSize: 11 }} interval={1} label={{ value: 'Hour (24h format)', position: 'insideBottom', offset: -5, style: { fontSize: 12 } }} />
@@ -231,7 +209,6 @@ export function Home() {
               </CardContent>
             </Card>
     
-            {/* 3. TimelineByDay (KODE RESPONSIF) */}
             <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -241,7 +218,7 @@ export function Home() {
               </CardHeader>
               <CardContent className="h-[300px]">
                 {hasMounted && (
-                  <ResponsiveContainer width="100%" height={300}>
+                  <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={weeklyData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="day" stroke="#888" tick={{ fontSize: 11 }} />
@@ -262,10 +239,7 @@ export function Home() {
           </div>
         </div>
       </div>
-    
-      {/* --- KODE TOP COMMENTS LANGSUNG DI SINI --- */}
       
-      {/* Top Comments Section */}
       <div className="mb-8">
         <h2 className="text-gray-900 mb-4 flex items-center gap-2">
           <MessageCircle className="size-5 text-pink-500" />
@@ -273,7 +247,6 @@ export function Home() {
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
-          {/* 4. TopCommentsByLikes */}
           <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -310,7 +283,6 @@ export function Home() {
             </CardContent>
           </Card>
           
-          {/* 5. TopCommentsByReplies */}
           <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -349,7 +321,6 @@ export function Home() {
         </div>
       </div>
 
-      {/* 6. TopUsers */}
       <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
