@@ -44,12 +44,6 @@ const EmotionAnalysis = () => {
     percentage: ((count / totalRecords) * 100).toFixed(1)
   }));
 
-  const barData = Object.entries(emotionDistribution).map(([emotion, count]) => ({
-    emotion: emotion.charAt(0).toUpperCase() + emotion.slice(1),
-    count: count,
-    percentage: ((count / totalRecords) * 100).toFixed(1)
-  }));
-
   const dominantEmotionName = 'ANGER';
   const dominantEmotionPercentage = '84.3';
 
@@ -150,6 +144,14 @@ const EmotionAnalysis = () => {
     { emotion: 'Sadness', 'False': 124, 'True': 61 }
   ];
 
+  const proportionData = [
+    { emotion: 'Anger', sarcasm: ((90/1445)*100).toFixed(1), complaint: ((498/1445)*100).toFixed(1) },
+    { emotion: 'Sadness', sarcasm: ((0/185)*100).toFixed(1), complaint: ((61/185)*100).toFixed(1) },
+    { emotion: 'Happiness', sarcasm: ((0/53)*100).toFixed(1), complaint: ((21/53)*100).toFixed(1) },
+    { emotion: 'Love', sarcasm: ((0/17)*100).toFixed(1), complaint: ((7/17)*100).toFixed(1) },
+    { emotion: 'Fear', sarcasm: ((0/15)*100).toFixed(1), complaint: ((4/15)*100).toFixed(1) }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 p-8">
       {/* Header */}
@@ -206,7 +208,7 @@ const EmotionAnalysis = () => {
       {/* Emotion Distribution */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center">
-          Distribusi Emosi
+          Analisis Emosi & Konteks
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 hover:shadow-lg transition-all">
@@ -253,25 +255,23 @@ const EmotionAnalysis = () => {
           </div>
 
           <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 hover:shadow-lg transition-all">
-            <h3 className="text-base font-semibold text-gray-700 mb-5 text-center">Jumlah per Emosi</h3>
+            <h3 className="text-base font-semibold text-gray-700 mb-5 text-center">Proporsi Konteks per Emosi</h3>
             <div className="w-full" style={{height: '320px'}}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} margin={{ top: 10, right: 15, bottom: 20, left: 15 }}>
+                <BarChart 
+                  data={proportionData} 
+                  margin={{ top: 10, right: 15, bottom: 20, left: 15 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="emotion" tick={{fontSize: 11}} />
-                  <YAxis tick={{fontSize: 11}} />
+                  <YAxis tick={{fontSize: 11}} label={{ value: 'Persentase (%)', angle: -90, position: 'insideLeft', style: {fontSize: 11} }} />
                   <Tooltip 
-                    formatter={(value, name, props) => [
-                      `${value} (${props.payload.percentage}%)`,
-                      'Count'
-                    ]}
+                    formatter={(value) => `${value}%`}
                     contentStyle={{borderRadius: '8px', border: '1px solid #e5e7eb'}}
                   />
-                  <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-                    {barData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={emotionColors[entry.emotion.toLowerCase()] || '#6b7280'} />
-                    ))}
-                  </Bar>
+                  <Legend wrapperStyle={{fontSize: '11px'}} />
+                  <Bar dataKey="sarcasm" fill="#fb923c" radius={[4, 4, 0, 0]} name="% Sarkasme" />
+                  <Bar dataKey="complaint" fill="#ef4444" radius={[4, 4, 0, 0]} name="% Keluhan" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
