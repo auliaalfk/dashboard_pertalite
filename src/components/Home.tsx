@@ -14,26 +14,31 @@ interface KpiCards {
   total_replies: number;
   avg_engagement: number;
 }
+
 interface DailyTrend { date_WIB: string; comments: number; }
 interface HourlyTrend { hour_WIB: number; comments: number; }
 interface WeeklyTrend { day: string; comments: number; }
+
 interface TopComment {
   text: string;
   uniqueId: string;
   diggCount: number;
   replyCommentTotal: number;
 }
+
 interface TopRepliedComment {
   text: string;
   uniqueId: string;
   replyCommentTotal: number;
   diggCount: number;
 }
+
 interface TopUser {
   username: string;
   total_likes: number;
   rank: number;
 }
+
 interface HomeData {
   kpi_cards: KpiCards;
   daily_trend_chart: DailyTrend[];
@@ -78,13 +83,14 @@ export function Home() {
       });
   }, []); 
 
-  
   if (isLoading) {
     return <div className="p-8 text-center text-lg">Memuat data dashboard...</div>;
   }
+
   if (error) {
     return <div className="p-8 text-center text-lg text-red-500">{error}</div>;
   }
+
   if (!data) {
     return <div className="p-8 text-center text-lg">Data tidak ditemukan.</div>;
   }
@@ -105,6 +111,7 @@ export function Home() {
     'Monday': 'Senin', 'Tuesday': 'Selasa', 'Wednesday': 'Rabu',
     'Thursday': 'Kamis', 'Friday': 'Jumat', 'Saturday': 'Sabtu', 'Sunday': 'Minggu'
   };
+  
   const weeklyData = data.weekly_chart.map(item => ({
     ...item,
     day: dayMapping[item.day] || item.day
@@ -113,7 +120,6 @@ export function Home() {
   const topUsersCol1 = data.most_influential_accounts.filter(user => user.rank <= 5);
   const topUsersCol2 = data.most_influential_accounts.filter(user => user.rank > 5);
 
-  
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -159,9 +165,9 @@ export function Home() {
                 Daily Comment Activity & Engagement Trend
               </CardTitle>
             </CardHeader>
-            <CardContent className="h-[350px]"> 
+            <CardContent>
               {hasMounted && (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={350}>
                   <AreaChart data={data.daily_trend_chart}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="date_WIB" stroke="#888" tick={{ fontSize: 12 }} />
@@ -188,9 +194,9 @@ export function Home() {
                   Hourly Distribution Pattern
                 </CardTitle>
               </CardHeader>
-              <CardContent className="h-[300px]">
+              <CardContent>
                 {hasMounted && (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={hourlyData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="hour" stroke="#888" tick={{ fontSize: 11 }} interval={1} label={{ value: 'Hour (24h format)', position: 'insideBottom', offset: -5, style: { fontSize: 12 } }} />
@@ -208,7 +214,7 @@ export function Home() {
                 )}
               </CardContent>
             </Card>
-    
+
             <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -216,9 +222,9 @@ export function Home() {
                   Weekly Activity Pattern
                 </CardTitle>
               </CardHeader>
-              <CardContent className="h-[300px]">
+              <CardContent>
                 {hasMounted && (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={weeklyData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="day" stroke="#888" tick={{ fontSize: 11 }} />
