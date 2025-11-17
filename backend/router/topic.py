@@ -167,7 +167,7 @@ def load_original_comments():
         import pandas as pd
         
         # Path dataset lu
-        csv_path = "backend/data/pertalite_data.csv"
+        csv_path = "backend/data/pertalite_tiktok.csv"
         
         print(f"Current directory: {os.getcwd()}")
         print(f"Loading dataset from: {csv_path}")
