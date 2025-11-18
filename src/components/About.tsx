@@ -1,5 +1,7 @@
 import { Users, GraduationCap, Mail } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+
+// Placeholder images - replace with actual photo imports
 import tianPhoto from './assets/team/tian.jpeg';
 import deaPhoto from './assets/team/dea.jpeg';
 import dindaPhoto from './assets/team/dinda.jpeg';
@@ -22,7 +24,7 @@ const teamMembers = [
   {
     name: 'Dinda Ayu Permatasari',
     nrp: '3323600012',
-    email: 'dindapermatasari020@gmail.com',
+    email: 'dindapermatasari@gmail.com',
     photo: dindaPhoto,
   },
   {
@@ -97,64 +99,27 @@ export function About() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* First row - 3 members */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            {teamMembers.slice(0, 3).map((member, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+            {teamMembers.map((member, index) => (
               <div 
                 key={index}
-                className="p-4 rounded-xl bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 hover:shadow-lg transition-all border border-purple-100"
+                className="p-2 rounded-md bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 hover:shadow-lg transition-all border border-purple-100"
               >
                 <div className="flex flex-col items-center text-center">
-                  {/* Avatar Image */}
-                  <div className="w-4 h-14 rounded-full overflow-hidden mb-3 bg-gradient-to-br from-purple-200 to-pink-200 shadow-md" style={{ aspectRatio: '1/1' }}>
+                  {/* Avatar Image - SEMUA 32px */}
+                  <div className="w-8 h-8 rounded-full overflow-hidden mb-1.5 bg-gradient-to-br from-purple-200 to-pink-200 shadow-md">
                     <img 
                       src={member.photo}
                       alt={member.name}
                       className="w-full h-full object-cover"
-                      style={{ objectFit: 'cover', objectPosition: 'center' }}
                     />
                   </div>
                   
                   {/* Member Info */}
-                  <h3 className="font-semibold text-gray-900 mb-1 text-sm">{member.name}</h3>
-                  <p className="text-xs font-medium text-purple-600 mb-2">NRP: {member.nrp}</p>
-                  <div className="flex items-center gap-1 text-xs text-gray-600">
-                    <Mail className="w-3 h-3" />
-                    <a 
-                      href={`mailto:${member.email}`}
-                      className="hover:text-purple-600 transition-colors break-all"
-                    >
-                      {member.email}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Second row - 2 members centered */}
-          <div className="flex justify-center gap-4">
-            {teamMembers.slice(3, 5).map((member, index) => (
-              <div 
-                key={index + 3}
-                className="p-4 rounded-xl bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 hover:shadow-lg transition-all border border-purple-100 w-full md:w-1/3"
-              >
-                <div className="flex flex-col items-center text-center">
-                  {/* Avatar Image */}
-                  <div className="w-6 h-6 rounded-full overflow-hidden mb-3 bg-gradient-to-br from-purple-200 to-pink-200 shadow-md" style={{ aspectRatio: '1/1' }}>
-                    <img 
-                      src={member.photo}
-                      alt={member.name}
-                      className="w-full h-full object-cover"
-                      style={{ objectFit: 'cover', objectPosition: 'center' }}
-                    />
-                  </div>
-                  
-                  {/* Member Info */}
-                  <h3 className="font-semibold text-gray-900 mb-1 text-sm">{member.name}</h3>
-                  <p className="text-xs font-medium text-purple-600 mb-2">NRP: {member.nrp}</p>
-                  <div className="flex items-center gap-1 text-xs text-gray-600">
-                    <Mail className="w-3 h-3" />
+                  <h3 className="font-semibold text-gray-900 mb-0.5 text-base leading-tight">{member.name}</h3>
+                  <p className="text-xs font-medium text-purple-600 mb-0.5">NRP: {member.nrp}</p>
+                  <div className="flex items-center gap-0.5 text-[8px] text-gray-600">
+                    <Mail className="w-2.5 h-2.5" />
                     <a 
                       href={`mailto:${member.email}`}
                       className="hover:text-purple-600 transition-colors break-all"
